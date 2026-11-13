@@ -109,6 +109,24 @@ def _display(name):
     return stem or base
 
 
+# 本次实际加载了哪个文件：node_id -> 相对路径。
+# 随机模式下工作流里只存着「📁 分组」，只有执行到这里才知道抽中谁；
+# 元数据扩展（comfyui_image_metadata_extension）会读这张表把模型名/哈希写进图片。
+LAST_PICKED = {}
+
+
+def _remember(unique_id, name):
+    if unique_id is None or not name:
+        return
+    try:
+        LAST_PICKED[str(unique_id)] = name
+    except Exception:
+        return
+    if len(LAST_PICKED) > 128:
+        for key in list(LAST_PICKED)[:64]:
+            LAST_PICKED.pop(key, None)
+
+
 # ---------------------------------------------------------------- 节点
 
 class 随机Checkpoint加载器:
@@ -123,6 +141,7 @@ class 随机Checkpoint加载器:
                 "排除关键词": ("STRING", {"default": "",
                                         "tooltip": "文件名里含这些字就跳过（多个用逗号分隔）"}),
             },
+            "hidden": {"unique_id": "UNIQUE_ID"},
         }
 
     RETURN_TYPES = ("MODEL", "CLIP", "VAE")
@@ -139,7 +158,7 @@ class 随机Checkpoint加载器:
             return "%s|%s" % (模型, 排除关键词)
         return float("nan")
 
-    def load(self, 模型, 排除关键词=""):
+    def load(self, 模型, 排除关键词="", unique_id=None):
         name = _resolve("checkpoints", 模型)
         bad = [x.strip() for x in (排除关键词 or "").split(",") if x.strip()]
         if bad and any(b.lower() in name.lower() for b in bad):
@@ -147,6 +166,7 @@ class 随机Checkpoint加载器:
                     if not any(b.lower() in f.lower() for b in bad)]
             if pool:
                 name = random.choice(sorted(pool))
+        _remember(unique_id, name)
         path = folder_paths.get_full_path_or_raise("checkpoints", name)
         print("[随机Checkpoint] 本次使用：%s" % name)
         out = comfy.sd.load_checkpoint_guess_config(
@@ -165,6 +185,7 @@ class 随机UNet加载器:
                     "tooltip": "选📁分组=在该组随机抽；选具体文件名=固定用它"}),
                 "权重精度": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],),
             },
+            "hidden": {"unique_id": "UNIQUE_ID"},
         }
 
     RETURN_TYPES = ("MODEL",)
@@ -181,8 +202,9 @@ class 随机UNet加载器:
             return "%s|%s" % (模型, 权重精度)
         return float("nan")
 
-    def load(self, 模型, 权重精度):
+    def load(self, 模型, 权重精度, unique_id=None):
         name = _resolve("diffusion_models", 模型)
+        _remember(unique_id, name)
         opts = {}
         dt = _dtype(权重精度)
         if dt is not None:

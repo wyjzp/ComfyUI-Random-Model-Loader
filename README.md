@@ -32,6 +32,12 @@
 节点上会直接显示本次抽到的文件名（不含文件夹、不含后缀），跑完自动更新。
 前端的实现在 `web/random-model-loader.js`。
 
+## 元数据
+
+随机模式下（选 📁 分组 / 全部随机），节点执行时会把**真正抽到的文件**记下来，
+`comfyui_image_metadata_extension` 读这张表写入 `Model:` / `Model hash:`，
+所以上传 Civitai 时即使随机也能自动识别大模型。
+
 ## 安装
 
 把 `random-model-loader` 文件夹放进 `ComfyUI/custom_nodes/`，重启 ComfyUI。
@@ -83,6 +89,12 @@ xxx.safetensors         → always load this one (no randomness)
 
 The node shows the picked file name (folder and extension stripped) and updates after each run.
 The frontend part lives in `web/random-model-loader.js`.
+
+## Metadata
+
+In random mode (📁 folder / all models), the node records the file it actually picked while
+executing. `comfyui_image_metadata_extension` reads that record and writes `Model:` / `Model hash:`,
+so Civitai can still recognize the checkpoint when the model was chosen randomly.
 
 ## Install
 
