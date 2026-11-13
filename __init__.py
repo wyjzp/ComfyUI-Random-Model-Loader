@@ -150,6 +150,8 @@ class 随机Checkpoint加载器:
     CATEGORY = "模型/随机"
     DESCRIPTION = "从 checkpoints 里选或随机取一个完整模型，同时出 MODEL / CLIP / VAE。"
     OUTPUT_NODE = False
+    # 让元数据扩展不用猜模块名，直接从节点类上就能读到
+    LAST_PICKED = LAST_PICKED
 
     @classmethod
     def IS_CHANGED(s, 模型=ALL_LABEL, 排除关键词=""):
@@ -194,6 +196,8 @@ class 随机UNet加载器:
     CATEGORY = "模型/随机"
     DESCRIPTION = ("从 diffusion_models 里选或随机取一个 UNET。"
                    "⚠️ 只输出 MODEL，CLIP/VAE 要外接；不同架构混抽会炸。")
+    # 让元数据扩展不用猜模块名，直接从节点类上就能读到
+    LAST_PICKED = LAST_PICKED
 
     @classmethod
     def IS_CHANGED(s, 模型=ALL_LABEL, 权重精度="default"):
