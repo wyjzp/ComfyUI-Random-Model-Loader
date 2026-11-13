@@ -1,3 +1,9 @@
+<a id="chinese"></a>
+
+<p align="center">
+  <b>中文</b> ｜ <a href="#english">English</a>
+</p>
+
 # ComfyUI 随机模型加载器
 
 从文件夹里**随机挑一个模型**来加载，抽到哪个直接显示在节点上，不用再接 Show Text。
@@ -42,6 +48,12 @@
 配合其它随机节点使用。
 
 ---
+
+<a id="english"></a>
+
+<p align="center">
+  <a href="#chinese">中文</a> ｜ <b>English</b>
+</p>
 
 # ComfyUI Random Model Loader
 
