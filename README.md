@@ -40,3 +40,49 @@
 早年的版本里还有一个「Krea2专用随机LoRA加载器」，因为元数据/工作流兼容性问题已经移除。
 现在随机 LoRA 建议直接在 `Load LoRA Tag` 的提示词里写 `<lora:名字:权重>`，
 配合其它随机节点使用。
+
+---
+
+# ComfyUI Random Model Loader
+
+Pick a **random model from a folder** and load it. The selected file name is shown right on the
+node, so no extra Show Text node is needed.
+
+Two nodes (category: `模型/随机` — Model/Random):
+
+| Node | Reads from | Outputs |
+|---|---|---|
+| **Random Checkpoint Loader** | `models/checkpoints` | MODEL / CLIP / VAE |
+| **Random UNet Loader** | `models/diffusion_models` | MODEL |
+
+## Dropdown entries
+
+```
+📁 Folder name          → pick randomly from this folder (including subfolders)
+📁 (Root)               → pick randomly from the top level only
+（全部·随机）            → pick randomly from every model
+xxx.safetensors         → always load this one (no randomness)
+```
+
+- Choosing a folder / all models: **a new model is drawn on every queue**, there is no seed widget.
+- Choosing a specific file: behaves like the standard loader and always loads that file.
+
+## Display
+
+The node shows the picked file name (folder and extension stripped) and updates after each run.
+The frontend part lives in `web/random-model-loader.js`.
+
+## Install
+
+Drop the `random-model-loader` folder into `ComfyUI/custom_nodes/` and restart ComfyUI.
+
+## Notes
+
+⚠️ The Random UNet Loader only outputs MODEL; CLIP and VAE are connected separately. Mixing
+different architectures in one folder will break sampling — keep one architecture per folder.
+
+## History
+
+Older versions also shipped a "Krea2-only random LoRA loader". It has been removed because of
+metadata/workflow compatibility issues. For random LoRAs, write `<lora:name:weight>` in the prompt
+of a `Load LoRA Tag` node and combine it with any random node you already use.
